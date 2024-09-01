@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<stdbool.h>
 #include<stdlib.h>
 #include<math.h>
 /*
@@ -90,41 +91,122 @@ char *getData(int startingLen, char *msg){
     return data;
 }
 
+int getAge(){
+    while(true){
+        int age;
+        printf("Insira sua idade: ");
+        scanf("%d", &age);
+        fflush(stdin);
+
+        if(age < 17 || age > 100){
+            printf("Valor invalido");
+        }
+        else{
+            return age;
+        }
+    }
+}
+
+double getGrade(){
+    while(true){
+        double grade;
+        printf("Insira sua nota: ");
+        scanf("%lf", &grade);
+        fflush(stdin);
+
+        if(grade < 0.0 || grade > 10.0){
+            printf("Valor invalido");
+        }
+        else{
+            return grade;
+        }
+    }
+}
+
+bool getContinue(){
+    while(true){
+        printf("\nDeseja inserir o nome de outro aluno?\n");
+        char answer[4];
+
+        fgets(answer, 4, stdin);
+        fflush(stdin);
+
+        if(strcmp(strupr(answer), "SIM") == 0){
+            printf("\n\n");
+            return false;
+        }
+        else if (strcmp(strupr(answer), "NAO") == 0)
+        {
+            return true;
+        }
+        else{
+            printf("%s", answer);
+            printf("Nao consegui entender.\nPor favor digite \"SIM\" ou \"NAO\"\n");
+        }
+    }
+    return true;
+}
+
+double getAvg(double totalGrade, int studentCount){
+    if(studentCount == 0){
+        return -1;
+    }
+    else{
+        double avg = totalGrade/studentCount;
+        return avg;
+    }
+}
+
 int main(){
-
     struct student me;
-    me.name = getData(nameStartingSize, "Insira seu nome: ");
-    me.registration = getData(registrationStartingSize, "Insira sua matricula: ");
-    printf("Insira sua idade: ");
-    scanf("%d", &me.age);
-    printf("Insira sua nota: ");
-    scanf("%lf", &me.grade);
-
-    int nameLen = strlen(me.name);
-    int binNameLen = (nameLen * octetSize) + 1;
-    char *binStr = (char *)malloc(binNameLen);
-    binStr[0] = '\0'; //ADD NULL CHAR TO START OF STRING TO AVOID TRASH COLLECTION
+    double totalGrade = 0.0;
+    int studentCount = 0;
     
-    int registrationLen = strlen(me.registration);
-    int binRegistrationLen = (registrationLen * octetSize) + 1;
-    char *registrationBin = (char *)malloc(binRegistrationLen);
-    registrationBin[0] = '\0';
+    while(true){
+        printf("Aluno #%d\n", studentCount+1);
+        me.name = getData(nameStartingSize, "Insira seu nome: ");
+        me.registration = getData(registrationStartingSize, "Insira sua matricula: ");
+        me.age = getAge();
+        me.grade = getGrade();
 
-    textToBin(me.name, nameLen, binStr);
-    textToBin(me.registration, registrationLen, registrationBin);
-    printf("Nome - Binario: %s\n", binStr);
-    printf("Registration - Binario: %s\n\n", registrationBin);
+        int nameLen = strlen(me.name);
+        int binNameLen = (nameLen * octetSize) + 1;
+        char *binStr = (char *)malloc(binNameLen);
+        binStr[0] = '\0'; //ADD NULL CHAR TO START OF STRING TO AVOID TRASH COLLECTION
+        
+        int registrationLen = strlen(me.registration);
+        int binRegistrationLen = (registrationLen * octetSize) + 1;
+        char *registrationBin = (char *)malloc(binRegistrationLen);
+        registrationBin[0] = '\0';
 
-    int txtNameLen = ((binNameLen-1) / octetSize) + 1;  //REDUCE BIN LEN BY 1 DUE TO NULL CHAR. THEN ADD 1 TO USE NULL CHAR
-    char *txtStr = (char *)malloc(txtNameLen);
+        textToBin(me.name, nameLen, binStr);
+        textToBin(me.registration, registrationLen, registrationBin);
+        printf("Nome - Binario: %s\n", binStr);
+        printf("Registration - Binario: %s\n\n", registrationBin);
 
-    int txtRegistrationLen = ((binRegistrationLen-1) / octetSize) + 1;
-    char *txtRegistration = (char *)malloc(txtRegistrationLen);
+        int txtNameLen = ((binNameLen-1) / octetSize) + 1;  //REDUCE BIN LEN BY 1 DUE TO NULL CHAR. THEN ADD 1 TO USE NULL CHAR
+        char *txtStr = (char *)malloc(txtNameLen);
 
-    binToText(binStr, binNameLen, txtStr, txtNameLen);
-    binToText(registrationBin, binRegistrationLen, txtRegistration, txtRegistrationLen);
-    printf("Nome - Texto: %s\n", txtStr);
-    printf("Registration - Texto: %s\n", txtRegistration);
+        int txtRegistrationLen = ((binRegistrationLen-1) / octetSize) + 1;
+        char *txtRegistration = (char *)malloc(txtRegistrationLen);
 
+        binToText(binStr, binNameLen, txtStr, txtNameLen);
+        binToText(registrationBin, binRegistrationLen, txtRegistration, txtRegistrationLen);
+        printf("Nome - Texto: %s\n", txtStr);
+        printf("Registration - Texto: %s\n\n", txtRegistration);
+
+        totalGrade += me.grade;
+        studentCount ++;
+
+        if(getContinue()){
+            break;
+        }
+    }
+
+    double avg = getAvg(totalGrade, studentCount);
+    if(avg >= 0){
+        printf("Média das notas: %.2lf\n", avg);
+    }
+    
     return 0;
 }
