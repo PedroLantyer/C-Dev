@@ -10,6 +10,8 @@ AVERAGE
 */
 
 const int octetSize = 8;
+const int nameStartingSize = 64;
+const int registrationStartingSize = 16;
 
 struct student{
     char *name;
@@ -17,7 +19,6 @@ struct student{
     char *registration;
     double grade;
 };
-
 
 void reverseStr(char *str, int strLen, char *rStr){
     for(int i = 0; i < strLen; i++){
@@ -73,23 +74,40 @@ void binToText(char *binStr, int binLen, char *txtStr, int txtLen){
     txtStr[txtLen-1] = '\0';
 }
 
+void getInput(char *str, int len){
+    fgets(str, len, stdin);
+    
+    int strLen = strlen(str);
+    str = (char *)realloc(str, strLen*sizeof(char));
+    str[strLen-1] = '\0';
+}
+
+char *getData(int startingLen, char *msg){
+    int dataLen = startingLen*sizeof(char);
+    char *data = (char *)malloc(dataLen);
+    printf("%s", msg);
+    getInput(data, dataLen);
+    return data;
+}
 
 int main(){
-    /*SET USER DATA*/
+
     struct student me;
-    me.name = "Pedro";
-    me.age = 24;
-    me.registration = "202304084751";
-    me.grade = 10.0;
+    me.name = getData(nameStartingSize, "Insira seu nome: ");
+    me.registration = getData(registrationStartingSize, "Insira sua matricula: ");
+    printf("Insira sua idade: ");
+    scanf("%d", &me.age);
+    printf("Insira sua nota: ");
+    scanf("%lf", &me.grade);
 
     int nameLen = strlen(me.name);
-    int sizeOfBin = (nameLen * octetSize) + 1;
-    char *binStr = (char *)malloc(sizeOfBin);
+    int binNameLen = (nameLen * octetSize) + 1;
+    char *binStr = (char *)malloc(binNameLen);
     binStr[0] = '\0'; //ADD NULL CHAR TO START OF STRING TO AVOID TRASH COLLECTION
     
     int registrationLen = strlen(me.registration);
-    int sizeOfBinRegistration = (registrationLen * octetSize) + 1;
-    char *registrationBin = (char *)malloc(sizeOfBinRegistration);
+    int binRegistrationLen = (registrationLen * octetSize) + 1;
+    char *registrationBin = (char *)malloc(binRegistrationLen);
     registrationBin[0] = '\0';
 
     textToBin(me.name, nameLen, binStr);
@@ -97,14 +115,14 @@ int main(){
     printf("Nome - Binario: %s\n", binStr);
     printf("Registration - Binario: %s\n\n", registrationBin);
 
-    int txtLen = ((sizeOfBin-1) / octetSize) + 1;  //REDUCE BIN LEN BY 1 DUE TO NULL CHAR. THEN ADD 1 TO USE NULL CHAR
-    char *txtStr = (char *)malloc(txtLen);
+    int txtNameLen = ((binNameLen-1) / octetSize) + 1;  //REDUCE BIN LEN BY 1 DUE TO NULL CHAR. THEN ADD 1 TO USE NULL CHAR
+    char *txtStr = (char *)malloc(txtNameLen);
 
-    int txtRegistrationLen = ((sizeOfBinRegistration-1) / octetSize) + 1;
+    int txtRegistrationLen = ((binRegistrationLen-1) / octetSize) + 1;
     char *txtRegistration = (char *)malloc(txtRegistrationLen);
 
-    binToText(binStr, sizeOfBin, txtStr, txtLen);
-    binToText(registrationBin, sizeOfBinRegistration, txtRegistration, txtRegistrationLen);
+    binToText(binStr, binNameLen, txtStr, txtNameLen);
+    binToText(registrationBin, binRegistrationLen, txtRegistration, txtRegistrationLen);
     printf("Nome - Texto: %s\n", txtStr);
     printf("Registration - Texto: %s\n", txtRegistration);
 
