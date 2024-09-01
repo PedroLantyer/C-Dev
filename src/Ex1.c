@@ -93,15 +93,20 @@ int main(){
     registrationBin[0] = '\0';
 
     textToBin(me.name, nameLen, binStr);
-    printf("Nome - Binario: %s\n", binStr);
     textToBin(me.registration, registrationLen, registrationBin);
-    printf("Registration - Binario: %s\n", registrationBin);
+    printf("Nome - Binario: %s\n", binStr);
+    printf("Registration - Binario: %s\n\n", registrationBin);
 
     int txtLen = ((sizeOfBin-1) / octetSize) + 1;  //REDUCE BIN LEN BY 1 DUE TO NULL CHAR. THEN ADD 1 TO USE NULL CHAR
     char *txtStr = (char *)malloc(txtLen);
-    
+
+    int txtRegistrationLen = ((sizeOfBinRegistration-1) / octetSize) + 1;
+    char *txtRegistration = (char *)malloc(txtRegistrationLen);
+
     binToText(binStr, sizeOfBin, txtStr, txtLen);
+    binToText(registrationBin, sizeOfBinRegistration, txtRegistration, txtRegistrationLen);
     printf("Nome - Texto: %s\n", txtStr);
+    printf("Registration - Texto: %s\n", txtRegistration);
 
     return 0;
 }
